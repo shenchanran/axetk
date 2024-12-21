@@ -8,7 +8,7 @@ $dbname = "demo";
 $redis_address = '127.0.0.1';
 $redis_port = '6379';
 $template = 'default';
-
+$tokenPre = 'axe';//token前缀，用于识别不同题库
 
 
 

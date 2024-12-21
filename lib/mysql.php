@@ -21,7 +21,7 @@ class mysql
     public function Select(...$args)
     /*
         参数示例，接收n个数组
-        1：['数据表名'，'limit限制(可忽略)']，
+        1：['数据表名'，'limit限制(可忽略)','OR还是AND（默认AND）']，
         2-n:['列名'，'符号（<>=like）可忽略'，'匹配值']
     */
     {
@@ -41,7 +41,11 @@ class mysql
         if (count($args) < 1) {
             $sql .= '1';
         } else {
-            $sql .= implode(" AND ", $params);
+            if (count($info) > 2) {
+                $sql .= implode(" {$info[2]} ", $params);
+            }else{
+                $sql .= implode(" AND ", $params);
+            }
         }
         if (count($info) > 1) {
             $sql .= " LIMIT {$info[1]}";
@@ -71,7 +75,6 @@ class mysql
         $names = implode(',', $names);
         $datas = implode(',', $datas);
         $sql = "INSERT INTO {$db_name} ({$names}) VALUES({$datas})";
-        echo $sql;
         $result = $this->conn->query($sql);
         return $result;
     }
