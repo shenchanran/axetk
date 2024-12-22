@@ -2,14 +2,14 @@
 namespace config;
 // 定义配置参数
 $servername = "localhost";
-$username = "root";
-$password = "root";
+$username = "root6";
+$password = "root6";
 $dbname = "demo";
 $redis_address = '127.0.0.1';
 $redis_port = '6379';
 $template = 'default';
 $tokenPre = 'axe';//token前缀，用于识别不同题库
-
+$userredis = 0;//用户数据存储的redis位置
 
 
 $mysql = [$servername, $username, $password, $dbname];
