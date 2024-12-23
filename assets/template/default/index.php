@@ -21,10 +21,7 @@
                         <a class="nav-link active" aria-current="page" href="#">首页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">关于我们</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">联系我们</a>
+                        <a class="nav-link" href="/user/?sp=login">登录</a>
                     </li>
                 </ul>
             </div>

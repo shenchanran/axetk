@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,11 +12,13 @@
             max-width: 400px;
             margin: auto;
         }
+
         .form-toggle {
             cursor: pointer;
         }
     </style>
 </head>
+
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -36,27 +39,36 @@
             <form id="loginForm">
                 <div id="loginFields">
                     <div class="mb-3">
-                        <label for="loginEmail" class="form-label">邮箱地址</label>
-                        <input type="email" class="form-control" id="loginEmail" placeholder="请输入邮箱">
+                        <label for="username" class="form-label">邮箱地址/用户名</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="请输入邮箱或用户名">
                     </div>
                     <div class="mb-3">
-                        <label for="loginPassword" class="form-label">密码</label>
-                        <input type="password" class="form-control" id="loginPassword" placeholder="请输入密码">
+                        <label for="password" class="form-label">密码</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码">
                     </div>
                 </div>
                 <div id="registerFields" class="d-none">
                     <div class="mb-3">
                         <label for="registerName" class="form-label">用户名</label>
-                        <input type="text" class="form-control" id="registerName" placeholder="请输入用户名">
+                        <input type="text" class="form-control" id="registerName" name="registerName" placeholder="请输入用户名">
                     </div>
                     <div class="mb-3">
                         <label for="registerEmail" class="form-label">邮箱地址</label>
-                        <input type="email" class="form-control" id="registerEmail" placeholder="请输入邮箱">
+                        <input type="email" class="form-control" id="registerEmail" name="registerEmail" placeholder="请输入邮箱">
                     </div>
                     <div class="mb-3">
                         <label for="registerPassword" class="form-label">密码</label>
-                        <input type="password" class="form-control" id="registerPassword" placeholder="请输入密码">
+                        <input type="password" class="form-control" id="registerPassword" name="registerPassword" placeholder="请输入密码">
                     </div>
+                    <div class="mb-3">
+                        <label for="rePassword" class="form-label">重复密码</label>
+                        <input type="password" class="form-control" id="rePassword" name="rePassword" placeholder="请重复输入密码">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="registerPassword" class="form-label">验证码</label>
+                    <input type="text" id="captcha" name="captcha" class="form-control" placeholder="请输入验证码" required>
+                    <img id="captcha-img" alt="验证码" class="captcha-img">
                 </div>
                 <button type="submit" class="btn btn-primary w-100" id="formButton">登录</button>
             </form>
@@ -72,11 +84,20 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- JavaScript -->
     <script>
-        const formTitle = document.getElementById('formTitle');
-        const formButton = document.getElementById('formButton');
-        const toggleText = document.getElementById('toggleText');
-        const loginFields = document.getElementById('loginFields');
-        const registerFields = document.getElementById('registerFields');
+        const $ = (a) => {
+            return document.querySelector(a)
+        };
+
+        function captcha() {
+            $('#captcha').value = '';
+            $('#captcha-img').setAttribute('src', 'api.php?captcha-time=' + Math.round(new Date() / 1000));
+        }
+        captcha();
+        const formTitle = $('#formTitle');
+        const formButton = $('#formButton');
+        const toggleText = $('#toggleText');
+        const loginFields = $('#loginFields');
+        const registerFields = $('#registerFields');
 
         // Toggle form view between login and register
         toggleText.addEventListener('click', () => {
@@ -94,16 +115,114 @@
                 loginFields.classList.remove('d-none');
             }
         });
-
+        $('#captcha-img').addEventListener('click', captcha);
         // Handle form submission (for demonstration purposes)
-        document.getElementById('loginForm').addEventListener('submit', function(event) {
+        $('#loginForm').addEventListener('submit', function(event) {
             event.preventDefault();
             if (formTitle.innerText === '登录') {
-                alert('登录成功！');
+                const username = $('#username').value;
+                const password = $('#password').value;
+                const captchacode = $('#captcha').value;
+                if (!username) {
+                    alert('请输入用户名');
+                    return;
+                } else if (!password) {
+                    alert('请输入密码');
+                    return;
+                } else if (!captchacode) {
+                    alert('请输入验证码');
+                    return;
+                }
+                data = {
+                    act: 'login',
+                    username,
+                    password,
+                    captchacode,
+                }
+                fetch('api.php', {
+                        method: 'POST', // 请求方法
+                        headers: {
+                            'Content-Type': 'application/json' // 设置请求头，说明请求体是 JSON 格式
+                        },
+                        body: JSON.stringify(data) // 将 JavaScript 对象转换为 JSON 字符串作为请求体
+                    })
+                    .then(response => {
+                        if (!response.ok) { // 如果响应状态码不是 2xx
+                            alert('登陆失败，请重试')
+                            throw new Error('请求失败，状态码: ' + response.status);
+                        }
+                        return response.json(); // 解析响应体为 JSON
+                    })
+                    .then(data => {
+                        if (data.code != 1) {
+                            alert(data.msg);
+                            captcha()
+                            return;
+                        }
+                        window.location.href = '/user?sp=usercenter';
+                    })
+                    .catch(error => {
+                        console.error('发生错误:', error); // 捕获并处理任何错误
+                        alert('登陆失败，请重试')
+                    });
             } else {
-                alert('注册成功！');
+                const username = $('#registerName').value;
+                const email = $('#registerEmail').value;
+                const password = $('#registerPassword').value;
+                const repassword = $('#rePassword').value;
+                const captchacode = $('#captcha').value;
+                if (!username) {
+                    alert('请输入用户名');
+                    return;
+                }else if(!email){
+                    alert('请输入邮箱');
+                    return;
+                } else if (!password) {
+                    alert('请输入密码');
+                    return;
+                } else if (password!==repassword) {
+                    alert('两次输入的密码不一致');
+                    return;
+                } else if (!captchacode) {
+                    alert('请输入验证码');
+                    return;
+                }
+                data = {
+                    act: 'reg',
+                    email,
+                    username,
+                    password,
+                    captchacode,
+                }
+                fetch('api.php', {
+                        method: 'POST', // 请求方法
+                        headers: {
+                            'Content-Type': 'application/json' // 设置请求头，说明请求体是 JSON 格式
+                        },
+                        body: JSON.stringify(data) // 将 JavaScript 对象转换为 JSON 字符串作为请求体
+                    })
+                    .then(response => {
+                        if (!response.ok) { // 如果响应状态码不是 2xx
+                            alert('注册失败，请重试')
+                            throw new Error('请求失败，状态码: ' + response.status);
+                        }
+                        return response.json(); // 解析响应体为 JSON
+                    })
+                    .then(data => {
+                        if (data.code != 1) {
+                            alert(data.msg);
+                            captcha()
+                            return;
+                        }
+                        window.location.href = '/user?sp=usercenter';
+                    })
+                    .catch(error => {
+                        console.error('发生错误:', error); // 捕获并处理任何错误
+                        alert('注册失败，请重试')
+                    });
             }
         });
     </script>
 </body>
+
 </html>

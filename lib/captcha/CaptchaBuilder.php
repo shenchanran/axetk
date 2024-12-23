@@ -9,14 +9,6 @@ interface CaptchaBuilderInterface
     public function create();
 
     /**
-     * 将验证码图片保存到指定路径
-     * @param string $filename 物理路径
-     * @param int $quality 清晰度
-     * @return mixed
-     */
-    public function save($filename, $quality);
-
-    /**
      * 获取验证码图片
      * @param int $quality 清晰度
      * @return mixed
@@ -24,13 +16,18 @@ interface CaptchaBuilderInterface
     public function output($quality);
 
     /**
-     * 获取验证码内容
-     * @return mixed
+     * 验证是否正确/未超时
+     * @return int
+     * 0代表错误，1代表正确，2代表超时
      */
-    public function getText();
+    public function check($code);
 }
 class CaptchaBuilder implements CaptchaBuilderInterface
 {
+    /**
+     * @var resource 超时时间
+     */
+    protected $timeout = 120;
     /**
      * @var resource 验证码图片
      */
@@ -46,7 +43,7 @@ class CaptchaBuilder implements CaptchaBuilderInterface
     /**
      * @var int 图片宽度
      */
-    protected $width = 150;
+    protected $width = 200;
     /**
      * @var int 图片高度
      */
@@ -90,6 +87,21 @@ class CaptchaBuilder implements CaptchaBuilderInterface
         $this->initialize([]);
     }
 
+    public function check($code){
+        $code = strtolower($code);
+        session_start();
+        if(isset($_SESSION['captcha'])){
+            $captcha = $_SESSION['captcha'];
+            unset($_SESSION['captcha']);
+            if(time()-$captcha['time']>$this->timeout){//验证超时
+                return 2;
+            }
+            if($code == $captcha['code']){
+                return 1;
+            }
+        }
+        return 0;
+    }
     public function initialize(array $config){
 
         isset($config['width']) && $this->width = $config['width'] ;
@@ -163,23 +175,17 @@ class CaptchaBuilder implements CaptchaBuilderInterface
         return $this;
     }
 
-    public function save($filename, $quality)
-    {
-        return imagepng($this->image,$filename,$quality);
-    }
-
     public function output($quality = 1)
     {
+        session_start();
         header('Cache-Control: private, max-age=0, no-store, no-cache, must-revalidate');
         header('Cache-Control: post-check=0, pre-check=0', false);
         header('Pragma: no-cache');
         header("content-type: image/png");
+        unset($_SESSION['captcha']);
+        $data = ["code"=>$this->text,"time"=>time()];
+        $_SESSION['captcha'] = $data;
         imagepng($this->image,null,$quality);
-    }
-
-    public function getText()
-    {
-        return $this->text;
     }
 
     public function destroy()
