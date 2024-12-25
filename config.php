@@ -10,6 +10,11 @@ $redis_port = '6379';
 $template = 'default';
 $tokenPre = 'axe';//token前缀，用于识别不同题库
 $userredis = 0;//用户数据存储的redis位置
+$cdnpublic = 'https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/';//公共CDn地址
+$sitename = 'AXE题库';//网站名
+$sitekeyword = '';//网站关键词
+$sitedescription = '';//网站描述
+$sitekefu = 'shenchanran';
 
 
 $mysql = [$servername, $username, $password, $dbname];

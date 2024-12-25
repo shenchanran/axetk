@@ -1,5 +1,5 @@
 <?php
-/* 此页面实现用户访问/user/目录未携带任何参数时，根据cookies判断用户师傅一登录，实现指定页面的跳转，请按需修改 */
+/* 此页面实现用户访问/user/目录未携带任何参数时，根据cookies判断用户是否登录，实现指定页面的跳转，请按需修改 */
 $domain = $_SERVER['HTTP_HOST']; 
 $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https://' : 'http://';
 $uri = $_SERVER['REQUEST_URI'];

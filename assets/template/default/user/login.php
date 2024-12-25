@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登录与注册</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?php echo $viewconfig['cdnpublic']?>bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .form-container {
             max-width: 400px;
@@ -23,7 +23,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">系统登录</a>
+            <a class="navbar-brand" href="#"><?php echo $viewconfig['sitename']?>-登录</a>
         </div>
     </nav>
 
@@ -77,18 +77,30 @@
 
     <!-- Footer -->
     <footer class="bg-light text-center py-3">
-        <p>&copy; 2024 系统登录与注册页面. 版权所有.</p>
+        <p>&copy; 2024 <?php echo $viewconfig['sitename']?>. 版权所有.</p>
     </footer>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="<?php echo $viewconfig['cdnpublic']?>bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <!-- JavaScript -->
     <script>
+        let w=false;
+        function wait(){
+            if(w){
+                return true;
+            }
+            w = true;
+            setTimeout(()=>{w=false},500);
+            return false;
+        }
         const $ = (a) => {
             return document.querySelector(a)
         };
 
         function captcha() {
+            if(wait()){
+                return;
+            }
             $('#captcha').value = '';
             $('#captcha-img').setAttribute('src', 'api.php?captcha-time=' + Math.round(new Date() / 1000));
         }
@@ -119,6 +131,9 @@
         // Handle form submission (for demonstration purposes)
         $('#loginForm').addEventListener('submit', function(event) {
             event.preventDefault();
+            if(wait()){
+                return;
+            }
             if (formTitle.innerText === '登录') {
                 const username = $('#username').value;
                 const password = $('#password').value;

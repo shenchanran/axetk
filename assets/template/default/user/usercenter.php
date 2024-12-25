@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AXE题库</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?php echo $viewconfig['cdnpublic']?>bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .main-container {
             display: flex;
@@ -38,16 +38,16 @@
         <!-- Sidebar Navigation -->
         <div class="sidebar">
             <ul class="list-group">
-                <li class="list-group-item" data-target="user-center">用户中心</li>
-                <li class="list-group-item" data-target="online-search">在线查题</li>
-                <li class="list-group-item" data-target="recharge">题库充值</li>
-                <li class="list-group-item" data-target="order-records">订单记录</li>
-                <li class="list-group-item" data-target="search-history">查题记录</li>
+                <li class="list-group-item item" data-target="user-center">用户中心</li>
+                <li class="list-group-item item" data-target="online-search">在线查题</li>
+                <li class="list-group-item item" data-target="recharge">题库充值</li>
+                <li class="list-group-item item" data-target="order-records">订单记录</li>
+                <li class="list-group-item item" data-target="search-history">查题记录</li>
             </ul>
         </div>
 
         <!-- Content Area -->
-        <div class="content">
+        <div class="content" style="margin-left:10px;">
             <div id="user-center" class="content-section active">
                 <h3>用户中心</h3>
                 <ul class="list-group">
@@ -175,25 +175,35 @@
     </div>
 
     <script>
-        // Sidebar navigation logic
-        document.querySelectorAll('.list-group-item').forEach(item => {
+        async function requests(data){
+            return new Promise(function(s,_){
+                
+            });
+        }
+        const $ = (a) => {
+            return document.querySelector(a)
+        };
+        let w=false;
+        function wait(){
+            if(w){
+                return true;
+            }
+            w = true;
+            setTimeout(()=>{w=false},500);
+            return false;
+        }
+        document.querySelectorAll('.item').forEach(item => {
             item.addEventListener('click', () => {
-                // Remove active class from all content sections
                 document.querySelectorAll('.content-section').forEach(section => {
                     section.classList.remove('active');
                 });
-                // Add active class to the targeted content section
                 const targetId = item.getAttribute('data-target');
                 document.getElementById(targetId).classList.add('active');
             });
         });
-
-        // Logout button functionality
         document.getElementById('logoutButton').addEventListener('click', () => {
             alert('您已退出登录。');
         });
-
-        // Search question functionality
         function searchQuestion(type) {
             const questionInput = document.getElementById('question-input').value;
             if (!questionInput) {
